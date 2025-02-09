@@ -3,70 +3,87 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/config/config.api.dart';
 
-
 class AuthService {
-  final String _baseUrl = ApiConfig.baseUrl;
-
   Future<void> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'email': email,
-        'password': password,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.baseUrl + ApiConfig.loginEndpoint),
+        headers: ApiConfig.headers,
+        body: json.encode({
+          'email': email,
+          'password': password,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      await _saveToken(data['token']);
-    } else {
-      throw Exception('Failed to login');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['token'] != null) {
+          await _saveToken(data['token']);
+        } else {
+          throw Exception('Token not found in response');
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['message'] ?? 'Failed to login');
+      }
+    } catch (e) {
+      print('Login error: $e'); // Pour le débogage
+      throw Exception('Failed to login: $e');
     }
   }
 
   Future<void> register(String name, String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'name': name,
-        'email': email,
-        'password': password,
-        'password_confirmation': password,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConfig.baseUrl + ApiConfig.registerEndpoint),
+        headers: ApiConfig.headers,
+        body: json.encode({
+          'name': name,
+          'email': email,
+          'password': password,
+          'password_confirmation': password,
+        }),
+      );
 
-    if (response.statusCode == 201) {
-      final data = json.decode(response.body);
-      await _saveToken(data['token']);
-    } else {
-      throw Exception('Failed to register');
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        if (data['token'] != null) {
+          await _saveToken(data['token']);
+        } else {
+          throw Exception('Token not found in response');
+        }
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['message'] ?? 'Failed to register');
+      }
+    } catch (e) {
+      print('Register error: $e'); // Pour le débogage
+      throw Exception('Failed to register: $e');
     }
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    if (token != null) {
-      try {
+    try {
+      final token = await getToken();
+      if (token != null) {
         await http.post(
-          Uri.parse('$_baseUrl/logout'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
+          Uri.parse(ApiConfig.baseUrl + ApiConfig.logoutEndpoint),
+          headers: ApiConfig.authHeaders(token),
         );
-      } finally {
-        await _removeToken();
       }
+    } finally {
+      await _removeToken();
     }
   }
 
   Future<bool> isAuthenticated() async {
+    final token = await getToken();
+    return token != null;
+  }
+
+  Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token') != null;
+    return prefs.getString('token');
   }
 
   Future<void> _saveToken(String token) async {

@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     final weekdayFormat = DateFormat('EEEE');
 
     return Scaffold(
-      backgroundColor: AppTheme.lightBackgroundColor,
+      backgroundColor: AppTheme.darkBackgroundColor,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

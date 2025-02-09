@@ -1,11 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:task_management/screens/home/screen.home.dart';
 import 'package:task_management/services/service.auth.dart';
 import 'package:task_management/theme/theme.app.dart';
 
 part 'widget.register.dart';
-
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -60,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.lightBackgroundColor,
+      backgroundColor: AppTheme.darkBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -94,10 +92,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 48),
                 TextFormField(
                   controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Full Name',
-                    labelStyle: const TextStyle(color: Colors.grey),
+                    labelStyle: const TextStyle(color: AppTheme.primaryColor),
                     filled: true,
                     fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
@@ -118,10 +116,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    labelStyle: const TextStyle(color: Colors.grey),
+                    labelStyle: const TextStyle(color: AppTheme.primaryColor),
                     filled: true,
                     fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
@@ -145,10 +143,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    labelStyle: const TextStyle(color: Colors.grey),
+                    labelStyle: const TextStyle(color: AppTheme.primaryColor),
                     filled: true,
                     fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
@@ -172,10 +170,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: true,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    labelStyle: const TextStyle(color: Colors.grey),
+                    labelStyle: const TextStyle(color: AppTheme.primaryColor),
                     filled: true,
                     fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
@@ -230,6 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       : const Text(
                           'Sign Up',
                           style: TextStyle(
+                            color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

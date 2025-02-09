@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:task_management/screens/home/screen.home.dart';
 import 'package:task_management/screens/register/screen.register.dart';
@@ -6,7 +5,6 @@ import 'package:task_management/services/service.auth.dart';
 import 'package:task_management/theme/theme.app.dart';
 
 part 'widget.login.dart';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.lightBackgroundColor,
+      backgroundColor: AppTheme.darkBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -86,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Email',
                     labelStyle: const TextStyle(color: Colors.grey),
@@ -113,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Password',
                     labelStyle: const TextStyle(color: Colors.grey),
@@ -171,6 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Text(
                           'Sign In',
                           style: TextStyle(
+                            color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -192,7 +191,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      child: const Text('Sign Up'),
+                      child: const Text('Sign Up',
+                          style: TextStyle(color: AppTheme.primaryColor)),
                     ),
                   ],
                 ),
