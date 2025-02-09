@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.4
+  sdk: ^3.5.2
 
 dependencies:
   flutter:
@@ -14,11 +14,44 @@ dependencies:
   cupertino_icons:
   flutter_svg:
   http:
-  shared_preferences:
-  intl:
   json_annotation:
   flutter_local_notifications:
   build_runner:
+  flutter_timezone:
+  equatable:
+  go_router:
+  timezone:
+  intl:
+  # Widgets
+  sliver_tools:
+  # Services
+  permission_handler:
+  path_provider:
+  hive_flutter:
+  hive_generator:
+  flutter_bloc:
+  hive:
+  bloc:
+  fl_chart:
+  shared_preferences:
+  carousel_slider:
+  shimmer:
+  image_picker:
+  fluttertoast:
+  floating_bottom_bar:
+  flutter_asset_generator:
+  flutter_animate:
+  cached_network_image:
+  skeletonizer:
+  timeago:
+  lottie:
+  camera:
+  flashy_tab_bar2:
+  timeline_tile:
+  flutter_doc_scanner:
+  path:
+  flutter_speed_dial:
+  flutter_rating_bar:
 
 dev_dependencies:
   flutter_test:

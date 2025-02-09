@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:task_management/models/model.task.dart';
@@ -18,13 +16,13 @@ class HomeScreen extends StatelessWidget {
     final weekdayFormat = DateFormat('EEEE');
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: AppTheme.lightBackgroundColor,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
               floating: true,
-              backgroundColor: AppTheme.backgroundColor,
+              backgroundColor: AppTheme.darkBackgroundColor,
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -126,7 +124,7 @@ class HomeScreen extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppTheme.surfaceColor,
+        backgroundColor: AppTheme.lightSurfaceColor,
         selectedItemColor: AppTheme.primaryColor,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,

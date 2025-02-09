@@ -60,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: AppTheme.lightBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -99,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Full Name',
                     labelStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: AppTheme.surfaceColor,
+                    fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Email',
                     labelStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: AppTheme.surfaceColor,
+                    fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -150,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Password',
                     labelStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: AppTheme.surfaceColor,
+                    fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -177,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Confirm Password',
                     labelStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: AppTheme.surfaceColor,
+                    fillColor: AppTheme.lightSurfaceColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,

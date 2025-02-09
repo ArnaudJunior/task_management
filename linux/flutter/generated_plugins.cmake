@@ -3,6 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  file_selector_linux
+  flutter_doc_scanner
+  flutter_timezone
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

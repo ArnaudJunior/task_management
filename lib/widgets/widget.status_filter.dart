@@ -51,7 +51,7 @@ class _StatusFilterState extends State<StatusFilter> {
         });
         widget.onStatusSelected(status);
       },
-      backgroundColor: AppTheme.surfaceColor,
+      backgroundColor: AppTheme.lightSurfaceColor,
       selectedColor: AppTheme.primaryColor,
       checkmarkColor: Colors.white,
     );
