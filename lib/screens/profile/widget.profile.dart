@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:task_management/theme/theme.app.dart';
 
 import '../login/screen.login.dart';
 
@@ -17,8 +18,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       title: Text(
         title,
-        style: TextStyle(
-          color: Colors.grey[600],
+        style: const TextStyle(
+          color: Colors.white,
           fontSize: 18,
           fontWeight: FontWeight.w500,
         ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_management/screens/home/widget.home.dart';
-import 'package:task_management/screens/register/screen.register.dart';
+import 'package:task_management/screens/register/widget.register.dart';
 import 'package:task_management/services/service.auth.dart';
 import 'package:task_management/theme/theme.app.dart';
 

@@ -117,7 +117,7 @@ class _AnalytiqueScreenState extends State<AnalytiqueScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Project Summary',
+                  'Task Summary',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _AnalytiqueScreenState extends State<AnalytiqueScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Let\'s Finish Your Project For Today!',
+                  'Let\'s Finish Your Task For Today!',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
@@ -145,7 +145,7 @@ class _AnalytiqueScreenState extends State<AnalytiqueScreen> {
                     Expanded(
                       child: ProjectSummaryCard(
                         count: _completedCount,
-                        label: 'Project Completed',
+                        label: 'Tasks Completed',
                         color: const Color(0xFF69C7C7),
                       ),
                     ),
@@ -156,7 +156,7 @@ class _AnalytiqueScreenState extends State<AnalytiqueScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Project Statistics',
+                      'Tasks Statistics',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -209,34 +209,6 @@ class _AnalytiqueScreenState extends State<AnalytiqueScreen> {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.folder_outlined),
-            label: 'Projects',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Notifications',
-          ),
-        ],
       ),
     );
   }

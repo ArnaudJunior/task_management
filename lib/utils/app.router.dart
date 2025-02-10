@@ -6,7 +6,7 @@ import 'package:task_management/screens/calendar/screen.calendar.dart';
 import 'package:task_management/screens/home/widget.home.dart';
 import 'package:task_management/screens/login/screen.login.dart';
 import 'package:task_management/screens/profile/widget.profile.dart';
-import 'package:task_management/screens/register/screen.register.dart';
+import 'package:task_management/screens/register/widget.register.dart';
 import 'package:task_management/screens/tasks/widget.tasks.dart';
 
 class AppRouter {

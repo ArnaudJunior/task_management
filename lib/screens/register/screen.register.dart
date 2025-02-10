@@ -1,10 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:task_management/screens/login/screen.login.dart';
-import 'package:task_management/services/service.auth.dart';
-import 'package:task_management/theme/theme.app.dart';
 
-part 'widget.register.dart';
+
+part of 'widget.register.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
