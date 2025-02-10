@@ -8,6 +8,9 @@ part 'widget.register.dart';
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
+  static const String path = '/register';
+  static const String name = 'RegisterScreen';
+
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }

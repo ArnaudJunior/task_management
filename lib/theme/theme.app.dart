@@ -78,4 +78,13 @@ class AppTheme {
       unselectedItemColor: Colors.grey,
     ),
   );
+
+  static Widget buildWrapper(BuildContext context, Widget? child) {
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: const TextScaler.linear(0.9),
+      ),
+      child: child!,
+    );
+  }
 }

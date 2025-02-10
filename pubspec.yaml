@@ -52,6 +52,7 @@ dependencies:
   path:
   flutter_speed_dial:
   flutter_rating_bar:
+  google_nav_bar:
 
 dev_dependencies:
   flutter_test:

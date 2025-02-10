@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:task_management/screens/bottom_nav/screen.bottom_nav_bar.dart';
 import 'package:task_management/screens/home/screen.home.dart';
 import 'package:task_management/screens/register/screen.register.dart';
 import 'package:task_management/services/service.auth.dart';
@@ -8,6 +10,9 @@ part 'widget.login.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  static const String path = '/';
+  static const String name = 'Login';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -37,9 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      context.pushNamed(HomeScreen.name);
     } catch (e) {
       setState(() {
         _errorMessage = 'Invalid email or password';
@@ -185,11 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterScreen(),
-                          ),
-                        );
+                        context.pushNamed(RegisterScreen.name);
                       },
                       child: const Text('Sign Up',
                           style: TextStyle(color: AppTheme.primaryColor)),
