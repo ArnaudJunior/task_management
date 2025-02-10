@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:task_management/database/app.generalmanager.dart';
-import 'package:task_management/screens/home/screen.home.dart';
-import 'package:task_management/screens/login/screen.login.dart';
-import 'package:task_management/services/service.auth.dart';
 import 'package:task_management/theme/theme.app.dart';
 import 'package:task_management/utils/app.router.dart';
 
@@ -43,7 +40,6 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      builder: AppTheme.buildWrapper,
       debugShowCheckedModeBanner: false,
       routerConfig: _appRouter.router,
     );

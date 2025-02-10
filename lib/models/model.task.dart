@@ -1,91 +1,117 @@
 
 
+import 'dart:convert';
+
 class Task {
   final int id;
   final String title;
-  final String? description;
-  final int createdBy;
-  final int? assignedTo;
-  final String status;
-  final String priority;
+  final String description;
   final DateTime dueDate;
-  final int? estimatedTime;
-  final int? trackedTime;
-  final List<ChecklistItem> checklist;
+  final String priority;
+  final String status;
+  final User createdBy;
+  final User assignedTo;
+  final int commentsCount;
+  final int attachmentsCount;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Task({
     required this.id,
     required this.title,
-    this.description,
-    required this.createdBy,
-    this.assignedTo,
-    required this.status,
-    required this.priority,
+    required this.description,
     required this.dueDate,
-    this.estimatedTime,
-    this.trackedTime,
-    required this.checklist,
+    required this.priority,
+    required this.status,
+    required this.createdBy,
+    required this.assignedTo,
+    required this.commentsCount,
+    required this.attachmentsCount,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  factory Task.fromJson(Map<String, dynamic> json) {
+  factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String?,
-      createdBy: json['createdBy'] as int,
-      assignedTo: json['assignedTo'] as int?,
-      status: json['status'] as String,
-      priority: json['priority'] as String,
-      dueDate: DateTime.parse(json['due_date'] as String),
-      estimatedTime: json['estimated_time'] as int?,
-      trackedTime: json['tracked_time'] as int?,
-      checklist: (json['checklist'] as List<dynamic>)
-          .map((e) => ChecklistItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      dueDate: DateTime.parse(map['due_date']),
+      priority: map['priority'],
+      status: map['status'],
+      createdBy: User.fromMap(map['created_by']),
+      assignedTo: User.fromMap(map['assigned_to']),
+      commentsCount: map['comments_count'],
+      attachmentsCount: map['attachments_count'],
+      createdAt: DateTime.parse(map['created_at']),
+      updatedAt: DateTime.parse(map['updated_at']),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'createdBy': createdBy,
-        'assignedTo': assignedTo,
-        'status': status,
-        'priority': priority,
-        'due_date': dueDate.toIso8601String(),
-        'estimated_time': estimatedTime,
-        'tracked_time': trackedTime,
-        'checklist': checklist.map((e) => e.toJson()).toList(),
-      };
+  factory Task.fromJson(String source) => Task.fromMap(json.decode(source));
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'due_date': dueDate.toIso8601String(),
+      'priority': priority,
+      'status': status,
+      'created_by': createdBy.toMap(),
+      'assigned_to': assignedTo.toMap(),
+      'comments_count': commentsCount,
+      'attachments_count': attachmentsCount,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+  int get totalWorkHours => dueDate.difference(createdAt).inHours;
+  String toJson() => json.encode(toMap());
 }
 
-class ChecklistItem {
-  final int id;
-  final String item;
-  final bool isCompleted;
-  final int order;
 
-  ChecklistItem({
+class User {
+  final int id;
+  final String name;
+  final String email;
+  final String? avatar;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  User({
     required this.id,
-    required this.item,
-    required this.isCompleted,
-    required this.order,
+    required this.name,
+    required this.email,
+    this.avatar,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  factory ChecklistItem.fromJson(Map<String, dynamic> json) {
-    return ChecklistItem(
-      id: json['id'] as int,
-      item: json['item'] as String,
-      isCompleted: json['is_completed'] as bool,
-      order: json['order'] as int,
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      id: map['id'],
+      name: map['name'],
+      email: map['email'],
+      avatar: map['avatar'],
+      createdAt: DateTime.parse(map['created_at']),
+      updatedAt: DateTime.parse(map['updated_at']),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'item': item,
-        'is_completed': isCompleted,
-        'order': order,
-      };
+  factory User.fromJson(String source) => User.fromMap(json.decode(source));
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'avatar': avatar,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  String toJson() => json.encode(toMap());
 }
+

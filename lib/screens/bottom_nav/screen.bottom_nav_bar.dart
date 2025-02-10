@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:task_management/screens/home/screen.home.dart';
+import 'package:task_management/screens/home/widget.home.dart';
+import 'package:task_management/screens/tasks/widget.tasks.dart';
+import 'package:task_management/theme/theme.app.dart';
 
 class CustomerBottomNavigationScreen extends StatefulWidget {
   final StatefulNavigationShell shell;
@@ -32,6 +34,13 @@ class _CustomerBottomNavigationScreenState
     return Scaffold(
       extendBody: true,
       body: widget.shell,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.pushNamed(AddTaskScreen.name);
+        },
+        backgroundColor: AppTheme.primaryColor,
+        child: const Icon(Icons.add),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,

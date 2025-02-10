@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_management/screens/home/screen.home.dart';
+import 'package:go_router/go_router.dart';
+import 'package:task_management/screens/login/screen.login.dart';
 import 'package:task_management/services/service.auth.dart';
 import 'package:task_management/theme/theme.app.dart';
 
@@ -42,9 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      context.pushNamed(LoginScreen.name);
     } catch (e) {
       setState(() {
         _errorMessage = 'Registration failed. Please try again.';

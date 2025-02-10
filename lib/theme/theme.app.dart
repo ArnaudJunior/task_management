@@ -20,6 +20,7 @@ class AppTheme {
   static const Color highPriorityColor = Color(0xFFFF4D4D);
   static const Color mediumPriorityColor = Color(0xFFFFB84D);
   static const Color lowPriorityColor = Color(0xFF4DFF4D);
+  static const Color taskCardColor = Color(0xFD4D4D);
 
   static ThemeData darkTheme = ThemeData.dark().copyWith(
     scaffoldBackgroundColor: darkBackgroundColor,
@@ -79,12 +80,12 @@ class AppTheme {
     ),
   );
 
-  static Widget buildWrapper(BuildContext context, Widget? child) {
-    return MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: const TextScaler.linear(0.9),
-      ),
-      child: child!,
-    );
-  }
+  // static Widget buildWrapper(BuildContext context, Widget? child) {
+  //   return MediaQuery(
+  //     data: MediaQuery.of(context).copyWith(
+  //       textScaler: const TextScaler.linear(0.9),
+  //     ),
+  //     child: child!,
+  //   );
+  // }
 }

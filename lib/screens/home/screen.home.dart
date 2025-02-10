@@ -1,16 +1,51 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:task_management/models/model.task.dart';
-import 'package:task_management/theme/theme.app.dart';
-import 'package:task_management/widgets/widget.status_filter.dart';
-import 'package:task_management/widgets/widget.task_card.dart';
-import 'package:task_management/widgets/widget.task_progress.dart';
+part of 'widget.home.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   static const String path = '/home';
   static const String name = 'Home';
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TaskService _taskService = TaskService();
+  bool _isLoading = true;
+  List<Task> _tasks = [];
+  String _selectedStatus = 'pending';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    try {
+      setState(() => _isLoading = true);
+      final tasks = await _taskService.getTasks();
+      setState(() {
+        _tasks = tasks;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors du chargement des tâches: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  List<Task> get _filteredTasks {
+    return _tasks.where((task) => task.status == _selectedStatus).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,113 +53,103 @@ class HomeScreen extends StatelessWidget {
     final dateFormat = DateFormat('MMMM d');
     final weekdayFormat = DateFormat('EEEE');
 
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.darkBackgroundColor,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              floating: true,
-              backgroundColor: AppTheme.darkBackgroundColor,
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dateFormat.format(today),
-                    style: const TextStyle(
-                      fontSize: 24,
+        child: RefreshIndicator(
+          onRefresh: _loadTasks,
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                floating: true,
+                backgroundColor: AppTheme.darkBackgroundColor,
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      dateFormat.format(today),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      weekdayFormat.format(today),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () {},
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TaskProgressCard(
+                    tasksCount: _tasks.length,
+                    completedCount:
+                        _tasks.where((t) => t.status == 'completed').length,
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'Today Tasks',
+                    style: TextStyle(
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  Text(
-                    weekdayFormat.format(today),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
-                  onPressed: () {},
-                  color: Colors.white,
-                ),
-              ],
-            ),
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: TaskProgressCard(
-                  tasksCount: 7,
-                  completedCount: 2,
                 ),
               ),
-            ),
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  'Tâches du jour',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 60,
+                  child: StatusFilter(
+                    onStatusSelected: (status) {
+                      setState(() => _selectedStatus = status);
+                    },
                   ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 60,
-                child: StatusFilter(
-                  onStatusSelected: (status) {
-                    // TODO: Implement status filter
-                  },
-                ),
-              ),
-            ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  // TODO: Replace with actual task data
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    child: TaskCard(
-                      task: Task(
-                        id: index,
-                        title: 'Research plan',
-                        description:
-                            'Prepare a research plan for a new project',
-                        createdBy: 1,
-                        assignedTo: null,
-                        status: 'to_do',
-                        priority: 'high',
-                        dueDate: DateTime.now(),
-                        estimatedTime: 120,
-                        trackedTime: 0,
-                        checklist: [],
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final task = _filteredTasks[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
                       ),
-                    ),
-                  );
-                },
-                childCount: 5,
+                      child: TaskCard(task: task),
+                    );
+                  },
+                  childCount: _filteredTasks.length,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Implement add task
-        },
-        backgroundColor: AppTheme.primaryColor,
-        child: const Icon(Icons.add),
       ),
     );
   }

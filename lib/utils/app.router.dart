@@ -1,15 +1,13 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:task_management/screens/analytics/screen.analytics.dart';
+import 'package:task_management/screens/analytics/widget.analytics.dart';
 import 'package:task_management/screens/bottom_nav/screen.bottom_nav_bar.dart';
 import 'package:task_management/screens/calendar/screen.calendar.dart';
-import 'package:task_management/screens/home/screen.home.dart';
+import 'package:task_management/screens/home/widget.home.dart';
 import 'package:task_management/screens/login/screen.login.dart';
-import 'package:task_management/screens/profile/screen.profile.dart';
+import 'package:task_management/screens/profile/widget.profile.dart';
 import 'package:task_management/screens/register/screen.register.dart';
+import 'package:task_management/screens/tasks/widget.tasks.dart';
 
 class AppRouter {
   final String initialRoute;
@@ -45,7 +43,6 @@ class AppRouter {
             return const RegisterScreen();
           },
         ),
-
 
         // ==> SHELLROUTE CLIENT
 
@@ -83,6 +80,14 @@ class AppRouter {
 
                     //   }
                     // ),
+
+                    GoRoute(
+                      path: AddTaskScreen.path,
+                      name: AddTaskScreen.name,
+                      builder: (BuildContext context, GoRouterState state) {
+                        return const AddTaskScreen();
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -104,8 +109,7 @@ class AppRouter {
                     name: CalendarScreen.name,
                     builder: (BuildContext context, GoRouterState state) {
                       return const CalendarScreen();
-                    }
-                  ),
+                    }),
               ],
             ),
             StatefulShellBranch(

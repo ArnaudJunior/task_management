@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:task_management/models/model.task.dart';
 import 'package:task_management/theme/theme.app.dart';
 
@@ -27,8 +28,10 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat('MMM d, y');
+
     return Card(
-      color: AppTheme.darkTaskCardColor,
+      color: AppTheme.taskCardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -73,32 +76,95 @@ class TaskCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                task.description ?? '',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 16,
+              if (task.description != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  task.description,
+                  style: const TextStyle(
+                    fontSize: 14,
                     color: Colors.grey,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Due ${task.dueDate.toString().split(' ')[0]}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Due ${dateFormat.format(task.dueDate)}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
+                  if (task.assignedTo != null)
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.person_outline,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          task.assignedTo.name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
+              if (task.commentsCount > 0 || task.attachmentsCount > 0) ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    if (task.commentsCount > 0) ...[
+                      const Icon(
+                        Icons.comment_outlined,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${task.commentsCount}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                    if (task.attachmentsCount > 0) ...[
+                      const Icon(
+                        Icons.attach_file,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${task.attachmentsCount}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ],
           ),
         ),
