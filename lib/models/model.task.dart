@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 class Task {
@@ -48,7 +46,9 @@ class Task {
     );
   }
 
-  factory Task.fromJson(String source) => Task.fromMap(json.decode(source));
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task.fromMap(json);
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -66,10 +66,10 @@ class Task {
       'updated_at': updatedAt.toIso8601String(),
     };
   }
+
   int get totalWorkHours => dueDate.difference(createdAt).inHours;
   String toJson() => json.encode(toMap());
 }
-
 
 class User {
   final int id;
@@ -114,4 +114,3 @@ class User {
 
   String toJson() => json.encode(toMap());
 }
-

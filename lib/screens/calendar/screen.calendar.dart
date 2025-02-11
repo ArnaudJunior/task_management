@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
+part of 'widget.calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -12,171 +12,225 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime selectedDate = DateTime.now();
-
-  List<Map<String, dynamic>> tasks = [
-    {
-      "title": "Research plan",
-      "time": "09:00 - 10:30",
-      "assignedTo": ["assets/user1.png"],
-      "color": Colors.grey[800]
-    },
-    {
-      "title": "Team Meeting",
-      "time": "11:00 - 12:30",
-      "assignedTo": ["assets/user2.png", "assets/user3.png"],
-      "color": Colors.amber[600]
-    },
-    {
-      "title": "Design review",
-      "time": "12:30 - 02:00",
-      "assignedTo": ["assets/user4.png"],
-      "color": Colors.blue[400]
-    },
-    {
-      "title": "PM Meeting",
-      "time": "02:30 - 03:30",
-      "assignedTo": ["assets/user5.png"],
-      "color": Colors.purple[400]
-    },
-  ];
+  final TaskService _taskService = TaskService();
+  final AuthService _authService = AuthService();
+  bool _isLoading = true;
+  List<Task> _tasks = [];
+  DateTime _selectedDate = DateTime.now();
+  String _userName = '';
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text("Calendar", style: TextStyle(color: Colors.white)),
-        centerTitle: true,
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      setState(() => _isLoading = true);
+
+      // Charger les tâches et le nom de l'utilisateur en parallèle
+      final futures = await Future.wait([
+        _taskService.getTasks(),
+        _authService.getCurrentUser(),
+      ]);
+
+      setState(() {
+        _tasks = futures[0] as List<Task>;
+        _userName = (futures[1] as User).name;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  List<Task> get _filteredTasks {
+    return _tasks.where((task) {
+      final taskDate = DateUtils.dateOnly(task.dueDate);
+      final selectedDate = DateUtils.dateOnly(_selectedDate);
+      return taskDate == selectedDate;
+    }).toList();
+  }
+
+  void _onDateSelected(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+  }
+
+  void _openTaskDetail(Task task) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TaskDetailScreen(task: task),
       ),
-      body: Column(
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildCalendarHeader(),
-          Expanded(child: _buildTaskList()),
+          Icon(
+            Icons.event_available,
+            size: 64,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No tasks for ${DateFormat('MMMM d').format(_selectedDate)}',
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Take a break or create a new task',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCalendarHeader() {
-    return Column(
-      children: [
-        Text(
-          DateFormat.yMMMM().format(selectedDate),
-          style: const TextStyle(
-              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
-        const SizedBox(height: 8),
-        _buildDaysRow(),
-      ],
-    );
-  }
+      );
+    }
 
-  Widget _buildDaysRow() {
-    DateTime firstDayOfMonth =
-        DateTime(selectedDate.year, selectedDate.month, 1);
-    int daysInMonth =
-        DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
-
-    return Container(
-      height: 60,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: daysInMonth,
-        itemBuilder: (context, index) {
-          DateTime day = firstDayOfMonth.add(Duration(days: index));
-          bool isSelected = day.day == selectedDate.day;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedDate = day;
-              });
-            },
-            child: Container(
-              width: 50,
-              alignment: Alignment.center,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: isSelected ? Colors.blue : Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
-              ),
+    return Scaffold(
+      backgroundColor: AppTheme.darkBackgroundColor,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    DateFormat.E().format(day),
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Hello $_userName 👋',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          Text(
+                            '${_filteredTasks.length} Tasks Today',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.search, color: Colors.white),
+                            onPressed: () {},
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.notifications_outlined,
+                                color: Colors.white),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  Text(
-                    "${day.day}",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                  const SizedBox(height: 20),
+                  DateSelector(
+                    selectedDate: _selectedDate,
+                    onDateSelected: _onDateSelected,
                   ),
                 ],
               ),
             ),
-          );
-        },
+            Expanded(
+              child: _filteredTasks.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _filteredTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = _filteredTasks[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: TaskListItem(
+                            task: task,
+                            onTap: () => _openTaskDetail(task),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildTaskList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        var task = tasks[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                task["time"],
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: task["color"],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task["title"],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: task["assignedTo"].map<Widget>((avatar) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 6.0),
-                            child: CircleAvatar(
-                              radius: 12,
-                              backgroundImage: AssetImage(avatar),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppTheme.darkSurfaceColor,
+        selectedItemColor: AppTheme.primaryColor,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
           ),
-        );
-      },
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_outline),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: 'Chat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
+        ],
+      ),
     );
   }
 }

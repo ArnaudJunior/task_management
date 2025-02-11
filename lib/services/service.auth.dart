@@ -95,4 +95,29 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
   }
+
+
+  Future<Map<String, dynamic>?> getCurrentUser() async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        throw Exception('No token found, user not authenticated');
+      }
+
+      final response = await http.get(
+        Uri.parse(ApiConfig.baseUrl + ApiConfig.userEndpoint),
+        headers: ApiConfig.authHeaders(token),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['message'] ?? 'Failed to fetch user data');
+      }
+    } catch (e) {
+      print('GetCurrentUser error: $e'); // Pour le débogage
+      return null;
+    }
+  }
 }

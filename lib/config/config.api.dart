@@ -5,6 +5,7 @@ class ApiConfig {
   static const String loginEndpoint = '/auth/login';
   static const String registerEndpoint = '/auth/register';
   static const String logoutEndpoint = '/auth/logout';
+  static const String userEndpoint = '/auth/user';
 
   // Headers
   static Map<String, String> get headers => {

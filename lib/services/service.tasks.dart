@@ -1,6 +1,3 @@
-
-
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:task_management/config/config.api.dart';
@@ -21,16 +18,21 @@ class TaskService {
         Uri.parse('${ApiConfig.baseUrl}/tasks'),
         headers: ApiConfig.authHeaders(token),
       );
-
+      print(response.body);
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => Task.fromJson(json)).toList();
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        if (!responseData.containsKey('data')) {
+          throw Exception('Réponse invalide : clé "data" non trouvée');
+        }
+
+        final List<dynamic> taskList = responseData['data'];
+        return taskList.map((item) => Task.fromJson(item)).toList();
       } else {
-        throw Exception('Échec du chargement des tâches');
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Erreur inconue');
       }
     } catch (e) {
       throw Exception('Erreur lors de la récupération des tâches: $e');
     }
   }
-  
 }

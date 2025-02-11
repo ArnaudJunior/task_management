@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_management/screens/analytics/widget.analytics.dart';
 import 'package:task_management/screens/bottom_nav/screen.bottom_nav_bar.dart';
-import 'package:task_management/screens/calendar/screen.calendar.dart';
+import 'package:task_management/screens/calendar/widget.calendar.dart';
 import 'package:task_management/screens/home/widget.home.dart';
 import 'package:task_management/screens/login/screen.login.dart';
 import 'package:task_management/screens/profile/widget.profile.dart';

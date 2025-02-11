@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:task_management/models/model.task.dart';
@@ -31,7 +29,7 @@ class TaskCard extends StatelessWidget {
     final dateFormat = DateFormat('MMM d, y');
 
     return Card(
-      color: AppTheme.taskCardColor,
+      color: AppTheme.darkSurfaceColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
