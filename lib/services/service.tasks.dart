@@ -15,7 +15,7 @@ class TaskService {
       }
 
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/tasks'),
+        Uri.parse(ApiConfig.baseUrl + ApiConfig.getTasks),
         headers: ApiConfig.authHeaders(token),
       );
       print(response.body);
@@ -33,6 +33,51 @@ class TaskService {
       }
     } catch (e) {
       throw Exception('Erreur lors de la récupération des tâches: $e');
+    }
+  }
+
+  Future<Task> createTask({
+    required String title,
+    required String description,
+    required DateTime dueDate,
+    required String priority,
+    required User assignedTo,
+    required String status,
+    required User createdBy,
+  }) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Non authentifié');
+      }
+
+      final response = await http.post(
+        Uri.parse(ApiConfig.baseUrl + ApiConfig.createTask),
+        headers: ApiConfig.authHeaders(token),
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'due_date': dueDate.toIso8601String(),
+          'priority': priority,
+          'status': status,
+          'assigned_to': assignedTo.toMap(),
+          'created_by': createdBy.toMap(),
+          'comments_count': 0,
+          'attachments_count': 0,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return Task.fromJson(data);
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['message'] ?? 'Échec de la création de la tâche');
+      }
+    } catch (e) {
+      throw Exception('Erreur lors de la création de la tâche: $e');
     }
   }
 }

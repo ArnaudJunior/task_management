@@ -5,7 +5,10 @@ class ApiConfig {
   static const String loginEndpoint = '/auth/login';
   static const String registerEndpoint = '/auth/register';
   static const String logoutEndpoint = '/auth/logout';
-  static const String userEndpoint = '/auth/user';
+  static const String userEndpoint = '/user';
+  static const String createTask = '/tasks';
+  static const String getTasks = '/tasks';
+  static const String getUsers = '/all/users';
 
   // Headers
   static Map<String, String> get headers => {

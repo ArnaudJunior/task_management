@@ -1,4 +1,3 @@
-
 part of 'widget.calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -17,7 +16,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   bool _isLoading = true;
   List<Task> _tasks = [];
   DateTime _selectedDate = DateTime.now();
-  String _userName = '';
 
   @override
   void initState() {
@@ -37,7 +35,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
       setState(() {
         _tasks = futures[0] as List<Task>;
-        _userName = (futures[1] as User).name;
         _isLoading = false;
       });
     } catch (e) {
@@ -136,7 +133,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Hello $_userName 👋',
+                            'Hello 👋',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge

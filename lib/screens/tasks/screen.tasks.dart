@@ -14,12 +14,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final TaskService _taskService = TaskService();
+  final AuthService _authService = AuthService();
+  String _status = 'pending';
+  User? _currentUser;
 
   DateTime _startDate = DateTime.now();
   DateTime _dueDate = DateTime.now().add(const Duration(days: 7));
   String _priority = 'high';
   List<String> _taskDetails = [];
   bool _isSubmitting = false;
+  User? _selectedAssigneeId;
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
@@ -50,6 +54,72 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
+  Future<void> _loadCurrentUser() async {
+    final userData = await _authService.getCurrentUser();
+    setState(() {
+      _currentUser = userData != null ? User.fromMap(userData) : null;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+// Widget pour la selection du status de la tache
+  Widget _buildStatusSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Status',
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppTheme.darkSurfaceColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _status,
+              isExpanded: true,
+              dropdownColor: AppTheme.darkSurfaceColor,
+              style: const TextStyle(color: Colors.white),
+              items: [
+                'pending',
+                'in_progress',
+                'completed',
+                'on_hold',
+              ].map((String status) {
+                return DropdownMenuItem<String>(
+                  value: status,
+                  child: Text(
+                    status.replaceAll('_', ' ').toUpperCase(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _status = newValue;
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _addTaskDetail(String detail) {
     setState(() {
       _taskDetails.add(detail);
@@ -64,12 +134,28 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   Future<void> _submitTask() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_selectedAssigneeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an assignee'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     setState(() => _isSubmitting = true);
 
     try {
-      // TODO: Implement task creation with API
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      await _taskService.createTask(
+        title: _titleController.text,
+        description: _descriptionController.text,
+        dueDate: _dueDate,
+        priority: _priority.toLowerCase(),
+        status: _status,
+        assignedTo: _selectedAssigneeId!,
+        createdBy: _currentUser!,
+      );
 
       if (!mounted) return;
 
@@ -188,246 +274,251 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           ),
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Task Name',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _titleController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Enter task name',
-                  hintStyle: TextStyle(color: Colors.grey[600]),
-                  filled: true,
-                  fillColor: AppTheme.darkSurfaceColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Task Name',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a task name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Description',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _descriptionController,
-                style: const TextStyle(color: Colors.white),
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Enter task description',
-                  hintStyle: TextStyle(color: Colors.grey[600]),
-                  filled: true,
-                  fillColor: AppTheme.darkSurfaceColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Start Date',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        InkWell(
-                          onTap: () => _selectDate(context, true),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppTheme.darkSurfaceColor,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  DateFormat('MM/dd/yyyy').format(_startDate),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.calendar_today,
-                                  color: Colors.grey,
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _titleController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Enter task name',
+                    hintStyle: TextStyle(color: Colors.grey[600]),
+                    filled: true,
+                    fillColor: AppTheme.darkSurfaceColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Due Date',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        InkWell(
-                          onTap: () => _selectDate(context, false),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppTheme.darkSurfaceColor,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  DateFormat('MM/dd/yyyy').format(_dueDate),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.calendar_today,
-                                  color: Colors.grey,
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a task name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Description',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _descriptionController,
+                  style: const TextStyle(color: Colors.white),
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Enter task description',
+                    hintStyle: TextStyle(color: Colors.grey[600]),
+                    filled: true,
+                    fillColor: AppTheme.darkSurfaceColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Priority',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
                 ),
-              ),
-              const SizedBox(height: 8),
-              PrioritySelector(
-                selectedPriority: _priority,
-                onPrioritySelected: (priority) {
-                  setState(() => _priority = priority);
-                },
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Assign to',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Start Date',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          InkWell(
+                            onTap: () => _selectDate(context, true),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.darkSurfaceColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    DateFormat('MM/dd/yyyy').format(_startDate),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.calendar_today,
+                                    color: Colors.grey,
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Due Date',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          InkWell(
+                            onTap: () => _selectDate(context, false),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.darkSurfaceColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    DateFormat('MM/dd/yyyy').format(_dueDate),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.calendar_today,
+                                    color: Colors.grey,
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              const UserAssignment(),
-              const SizedBox(height: 24),
-              const Text(
-                'Add Attachment',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
+                const SizedBox(height: 24),
+                const Text(
+                  'Priority',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const AttachmentItem(
-                fileName: 'Predictive_Maintenance_Model_v2.ipynb',
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Task Details',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
+                const SizedBox(height: 8),
+                PrioritySelector(
+                  selectedPriority: _priority,
+                  onPrioritySelected: (priority) {
+                    setState(() => _priority = priority);
+                  },
                 ),
-              ),
-              const SizedBox(height: 8),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _taskDetails.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == _taskDetails.length) {
-                    return TextButton(
-                      onPressed: () {
-                        _addTaskDetail('');
+                const SizedBox(height: 24),
+                _buildStatusSelector(),
+                const SizedBox(height: 24),
+                const Text(
+                  'Assign to',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                UserAssignment(
+                  onUserSelected: (userId) {
+                    // setState(() => _selectedAssigneeId = );
+                  },
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Task Details',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _taskDetails.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == _taskDetails.length) {
+                      return TextButton(
+                        onPressed: () {
+                          _addTaskDetail('');
+                        },
+                        child: const Text(
+                          'Add New',
+                          style: TextStyle(color: AppTheme.primaryColor),
+                        ),
+                      );
+                    }
+                    return TaskDetailItem(
+                      detail: _taskDetails[index],
+                      onDelete: () => _removeTaskDetail(index),
+                      onChanged: (value) {
+                        setState(() {
+                          _taskDetails[index] = value;
+                        });
                       },
-                      child: const Text(
-                        'Add New',
-                        style: TextStyle(color: AppTheme.primaryColor),
-                      ),
                     );
-                  }
-                  return TaskDetailItem(
-                    detail: _taskDetails[index],
-                    onDelete: () => _removeTaskDetail(index),
-                  );
-                },
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _isSubmitting ? null : _submitTask,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
+                  },
                 ),
-                child: _isSubmitting
-                    ? const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      )
-                    : const Text(
-                        'Submit',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitTask,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
+                      : const Text(
+                          'Submit',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

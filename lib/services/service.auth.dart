@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/config/config.api.dart';
+import 'package:task_management/models/model.task.dart';
 
 class AuthService {
   Future<void> login(String email, String password) async {
@@ -27,7 +28,7 @@ class AuthService {
         throw Exception(error['message'] ?? 'Failed to login');
       }
     } catch (e) {
-      print('Login error: $e'); // Pour le débogage
+      print('Login error: $e'); 
       throw Exception('Failed to login: $e');
     }
   }
@@ -96,7 +97,6 @@ class AuthService {
     await prefs.remove('token');
   }
 
-
   Future<Map<String, dynamic>?> getCurrentUser() async {
     try {
       final token = await getToken();
@@ -118,6 +118,35 @@ class AuthService {
     } catch (e) {
       print('GetCurrentUser error: $e'); // Pour le débogage
       return null;
+    }
+  }
+
+  Future<List<User>> getUsers() async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        throw Exception('Non authentifié');
+      }
+
+      final response = await http.get(
+        Uri.parse(ApiConfig.baseUrl + ApiConfig.getUsers),
+        headers: ApiConfig.authHeaders(token),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        if (!responseData.containsKey('data')) {
+          throw Exception('Réponse invalide : clé "data" non trouvée');
+        }
+
+        final List<dynamic> userList = responseData['data'];
+        return userList.map((item) => User.fromJson(item)).toList();
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Erreur inconnue');
+      }
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération des utilisateurs: $e');
     }
   }
 }

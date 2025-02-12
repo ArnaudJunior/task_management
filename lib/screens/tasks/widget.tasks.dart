@@ -1,8 +1,8 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:task_management/models/model.task.dart';
 import 'package:task_management/screens/home/widget.home.dart';
+import 'package:task_management/services/service.auth.dart';
 import 'package:task_management/services/service.tasks.dart';
 import 'package:task_management/theme/theme.app.dart';
 
@@ -63,7 +63,8 @@ class _PriorityButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primaryColor : AppTheme.darkSurfaceColor,
+            color:
+                isSelected ? AppTheme.primaryColor : AppTheme.darkSurfaceColor,
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
@@ -80,9 +81,61 @@ class _PriorityButton extends StatelessWidget {
   }
 }
 
+class UserAssignment extends StatefulWidget {
+  final Function(int?) onUserSelected;
 
-class UserAssignment extends StatelessWidget {
-  const UserAssignment({super.key});
+  const UserAssignment({
+    super.key,
+    required this.onUserSelected,
+  });
+
+  @override
+  State<UserAssignment> createState() => _UserAssignmentState();
+}
+
+class _UserAssignmentState extends State<UserAssignment> {
+  List<User> _users = [];
+  int? _selectedUserId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    try {
+      // TODO: Implement get users from API
+      // For now, using mock data
+      setState(() {
+        _users = [
+          User(
+            id: 1,
+            name: "John Doe",
+            email: "john@example.com",
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          User(
+            id: 2,
+            name: "Jane Smith",
+            email: "jane@example.com",
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+        ];
+      });
+    } catch (e) {
+      print('Error loading users: $e');
+    }
+  }
+
+  void _selectUser(int userId) {
+    setState(() {
+      _selectedUserId = userId == _selectedUserId ? null : userId;
+    });
+    widget.onUserSelected(_selectedUserId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,24 +144,34 @@ class UserAssignment extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildUserAvatar('https://i.pravatar.cc/150?img=1', 'John'),
-          _buildUserAvatar('https://i.pravatar.cc/150?img=2', 'Sarah'),
-          _buildUserAvatar('https://i.pravatar.cc/150?img=3', 'Mike'),
-          _buildUserAvatar('https://i.pravatar.cc/150?img=4', 'Emma'),
-          _buildUserAvatar('https://i.pravatar.cc/150?img=5', 'Alex'),
+          ..._users.map((user) => _buildUserAvatar(
+                user.avatar ?? 'https://i.pravatar.cc/150?img=${user.id}',
+                user.name,
+                user.id,
+              )),
           _AddUserButton(),
         ],
       ),
     );
   }
 
-  Widget _buildUserAvatar(String imageUrl, String name) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      child: CircleAvatar(
-        radius: 28,
-        backgroundColor: AppTheme.darkSurfaceColor,
-        backgroundImage: NetworkImage(imageUrl),
+  Widget _buildUserAvatar(String imageUrl, String name, int userId) {
+    final isSelected = userId == _selectedUserId;
+    return GestureDetector(
+      onTap: () => _selectUser(userId),
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: isSelected
+              ? Border.all(color: AppTheme.primaryColor, width: 2)
+              : null,
+        ),
+        child: CircleAvatar(
+          radius: 28,
+          backgroundColor: AppTheme.darkSurfaceColor,
+          backgroundImage: NetworkImage(imageUrl),
+        ),
       ),
     );
   }
@@ -137,7 +200,6 @@ class _AddUserButton extends StatelessWidget {
     );
   }
 }
-
 
 class AttachmentItem extends StatelessWidget {
   final String fileName;
@@ -183,17 +245,16 @@ class AttachmentItem extends StatelessWidget {
   }
 }
 
-
-
-
 class TaskDetailItem extends StatelessWidget {
   final String detail;
   final VoidCallback onDelete;
+  final Function(String) onChanged;
 
   const TaskDetailItem({
     super.key,
     required this.detail,
     required this.onDelete,
+    required this.onChanged,
   });
 
   @override
@@ -221,6 +282,7 @@ class TaskDetailItem extends StatelessWidget {
                 hintText: 'Enter task detail',
                 hintStyle: TextStyle(color: Colors.grey),
               ),
+              onChanged: onChanged,
             ),
           ),
           IconButton(
