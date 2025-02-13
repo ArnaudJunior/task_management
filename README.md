@@ -1,16 +1,33 @@
-# task_management
+# Task Management App
 
-A new Flutter project.
+- Create account
+- Create and assign task to other
+- Modify, delete & update task.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Quick Start
 
-A few resources to get you started if this is your first Flutter project:
+To spin up this example locally, follow these steps:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Clone
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If you have not done so already, you need to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+
+
+  Use the `git` CLI to clone this template directly to your machine:
+
+    git clone https://github.com/ArnaudJunior/task_management.git"
+
+
+### Development
+
+1. First [clone the repo](#clone) if you have not done so already
+1. `cd my-project`
+1. `flutter pub get` to install dependencies 
+1. `flutter run` to open the app in your emulator
+Make sure the backend server is already run
+
+
+## Questions
+
+If you have any issues or questions, reach out to us on [my site](https://www.wolle-jr.com/) 
