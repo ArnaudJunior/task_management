@@ -23,13 +23,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   String _priority = 'high';
   List<String> _taskDetails = [];
   bool _isSubmitting = false;
-  User? _selectedAssigneeId;
+  int? _selectedAssigneeId;
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+    final DateTime now = DateTime.now();
+    final DateTime minimumDate = isStartDate ? now : _startDate;
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: isStartDate ? _startDate : _dueDate,
-      firstDate: DateTime.now(),
+      firstDate: minimumDate,
       lastDate: DateTime(2025),
       builder: (context, child) {
         return Theme(
@@ -43,10 +46,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         );
       },
     );
+
     if (picked != null) {
       setState(() {
         if (isStartDate) {
           _startDate = picked;
+          // Si la date de début est après la date de fin, on ajuste la date de fin
+          if (_startDate.isAfter(_dueDate)) {
+            _dueDate = _startDate.add(const Duration(days: 1));
+          }
         } else {
           _dueDate = picked;
         }
@@ -252,6 +260,87 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 
+  void _showCalendarDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppTheme.darkSurfaceColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TableCalendar(
+                firstDay: DateTime.now(),
+                lastDay: DateTime(2025),
+                focusedDay: _dueDate,
+                selectedDayPredicate: (day) => isSameDay(_dueDate, day),
+                calendarStyle: const CalendarStyle(
+                  selectedDecoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  todayDecoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.fromBorderSide(
+                      BorderSide(color: AppTheme.primaryColor),
+                    ),
+                  ),
+                  defaultTextStyle: TextStyle(color: Colors.white),
+                  weekendTextStyle: TextStyle(color: Colors.grey),
+                  outsideTextStyle: TextStyle(color: Colors.grey),
+                  todayTextStyle: TextStyle(
+                    color: AppTheme.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                headerStyle: const HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  titleTextStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
+                  leftChevronIcon: Icon(
+                    Icons.chevron_left,
+                    color: Colors.white,
+                  ),
+                  rightChevronIcon: Icon(
+                    Icons.chevron_right,
+                    color: Colors.white,
+                  ),
+                ),
+                onDaySelected: (selectedDay, focusedDay) {
+                  setState(() {
+                    _dueDate = selectedDay;
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Annuler',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -342,7 +431,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Start Date',
+                            'Due Date',
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 16,
@@ -350,7 +439,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           ),
                           const SizedBox(height: 8),
                           InkWell(
-                            onTap: () => _selectDate(context, true),
+                            onTap: () => _showCalendarDialog(context),
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -362,7 +451,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    DateFormat('MM/dd/yyyy').format(_startDate),
+                                    DateFormat('dd MMM yyyy').format(_dueDate),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,

@@ -53,6 +53,7 @@ dependencies:
   flutter_speed_dial:
   flutter_rating_bar:
   google_nav_bar:
+  table_calendar:
 
 dev_dependencies:
   flutter_test:

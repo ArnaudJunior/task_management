@@ -7,6 +7,7 @@ class ApiConfig {
   static const String logoutEndpoint = '/auth/logout';
   static const String userEndpoint = '/user';
   static const String createTask = '/tasks';
+  static const String updateTask = '/tasks/{task}';
   static const String getTasks = '/tasks';
   static const String getUsers = '/all/users';
 

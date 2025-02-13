@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:task_management/models/model.task.dart';
 import 'package:task_management/screens/calendar/widget.calendar.dart';
+import 'package:task_management/screens/edit_tasks/widget.edit_tasks.dart';
 import 'package:task_management/theme/theme.app.dart';
 
 part 'screen.task_detail.dart';
