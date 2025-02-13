@@ -99,7 +99,9 @@ class User {
     );
   }
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source));
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User.fromMap(json);
+  }
 
   Map<String, dynamic> toMap() {
     return {

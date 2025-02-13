@@ -543,7 +543,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 const SizedBox(height: 8),
                 UserAssignment(
                   onUserSelected: (userId) {
-                    // setState(() => _selectedAssigneeId = );
+                    setState(() => _selectedAssigneeId = userId);
                   },
                 ),
                 const SizedBox(height: 24),
