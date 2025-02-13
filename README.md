@@ -25,9 +25,9 @@ If you have not done so already, you need to have standalone copy of this repo o
 1. `cd my-project`
 1. `flutter pub get` to install dependencies 
 1. `flutter run` to open the app in your emulator
-Make sure the backend server is already run
+1. Make sure the backend server is already run
 
 
 ## Questions
 
-If you have any issues or questions, reach out to us on [my site](https://www.wolle-jr.com/) 
+If you have any issues or questions, reach out to me on [my site](https://www.wolle-jr.com/) 
